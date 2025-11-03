@@ -1,0 +1,91 @@
+### 编译输出 ###
+target/
+build/
+out/
+bin/
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+
+### IDE ###
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Eclipse/STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+
+### 构建工具 ###
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+gradle-app.setting
+
+### 运行时文件 ###
+# 日志文件
+*.log
+logs/
+
+# 临时文件
+*.tmp
+*.temp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+### 应用配置 ###
+# 忽略环境变量文件
+.env
+.env.local
+.env.production
+
+# 保护生产配置：忽略所有properties/yml，但保留应用配置模板
+*.properties
+*.yml
+*.yaml
+!src/main/resources/application*.yml
+!src/main/resources/application*.yaml
+!src/main/resources/application*.properties
+
+### 其他 ###
+# 虚拟机文件
+*.class
+hs_err_pid*
+*.hprof
+*.nar
+*.rar
