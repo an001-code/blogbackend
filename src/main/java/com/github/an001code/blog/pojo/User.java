@@ -30,5 +30,8 @@ public class User {
     private String signature;//签名
     private LocalDateTime createdAt;//创建时间
     private LocalDateTime updatedAt;//更新时间
+    private String jwt;  //jwt令牌
 
 }
+
+

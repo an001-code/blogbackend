@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.an001code.blog.mapper.UserMapper">
+
+    <select id="getUserList" resultType="com.github.an001code.blog.pojo.User">
+       select user_id,identifier,user_name,email,role,status,avatar,gender,birthday,signature,
+              created_at,updated_at
+       from user
+       <where>
+           <if test="query != null and query != ''">
+              (user_name like concat('%',#{query},'%')
+               or identifier like concat('%',#{query},'%'))
+           </if>
+           <if test="userId != null">
+               and user_id = #{userId}
+           </if>
+           <if test="status != null">
+               and status = #{status}
+           </if>
+           <if test="begin != null and end != null">
+               and DATE(created_at) between #{begin} and #{end}
+           </if>
+       </where>
+            order by created_at desc
+    </select>
+
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO user (user_name, email, password,role,status,avatar,gender,birthday,signature)
+        VALUES (#{userName}, #{email}, #{password},#{role},#{status},#{avatar},#{gender},#{birthday},#{signature})
+    </insert>
+
+    <update id="updateById" useGeneratedKeys="true" keyProperty="userId">
+        update user
+        <set>
+            <if test="userName != null and userName != ''">
+                user_name = #{userName},
+            </if>
+            <if test="role != null">
+                role = #{role},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="avatar != null and avatar != ''">
+                avatar = #{avatar},
+            </if>
+            <if test="gender != null">
+                gender = #{gender},
+            </if>
+            <if test="birthday != null and birthday != ''">
+                birthday = #{birthday},
+            </if>
+            <if test="signature != null and signature != ''">
+                signature = #{signature}
+            </if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="delete">
+        delete from user
+        where user_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

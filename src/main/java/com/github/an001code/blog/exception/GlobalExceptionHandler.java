@@ -1,8 +1,13 @@
 package com.github.an001code.blog.exception;
 
 import com.github.an001code.blog.pojo.Result;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 全局异常处理器
@@ -15,4 +20,8 @@ public class GlobalExceptionHandler {
          ex.printStackTrace();
          return Result.error("操作失败，请联系管理员");
     }
+
+
+
+
 }

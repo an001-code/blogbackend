@@ -12,8 +12,8 @@ spring:
       max-request-size: 100MB
   data:
     redis:
-      host: ${sky.redis.host}
-      port: ${sky.redis.port}
+      host: localhost
+      port: 6379
       database: 0
   profiles:
     active: dev

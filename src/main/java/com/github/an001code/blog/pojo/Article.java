@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 public class Article {
     private Long articleId;  //文章Id
     private Long userId;  //作者Id
+    private Long tagId;
     private String title; //标题
     private String content; //内容
     private String summary; //摘要
