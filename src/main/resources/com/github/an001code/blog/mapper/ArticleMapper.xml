@@ -34,4 +34,34 @@
            </where>
            order by a.updated_at desc
     </select>
+
+    <insert id="insert">
+        insert into article (user_id,tag_id,title,content,summary,cover_image,status,published_at)
+        values (#{userId},#{tagId},#{title},#{content},#{summary},#{coverImage},#{status},#{publishedAt})
+    </insert>
+
+    <update id="update">
+        update article
+        <set>
+            <if test="tagId != null">
+                tag_id = #{tagId},
+            </if>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="content != null">
+                content = #{content},
+            </if>
+            <if test="summary != null">
+                summary = #{summary},
+            </if>
+            <if test="coverImage != null">
+                cover_image = #{coverImage},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            
+        </set>
+    </update>
 </mapper>
