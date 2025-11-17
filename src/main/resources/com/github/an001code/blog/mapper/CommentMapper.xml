@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.an001code.blog.mapper.CommentMapper">
+
+
+    <select id="getCommentList" resultType="com.github.an001code.blog.pojo.Comment">
+        select *
+        from comment
+        <where>
+            <if test="articleId != null">
+                and article_id = #{articleId}
+            </if>
+            <if test="userId != null">
+                and user_id = #{userId}
+            </if>
+            <if test="parentId != null">
+                and parent_id = #{parentId}
+            </if>
+            <if test="isDeleted != null">
+                and is_deleted = #{isDeleted}
+            </if>
+        </where>
+        order by updated_at desc
+    </select>
+</mapper>
