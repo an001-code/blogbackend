@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.an001code.blog.mapper.ArticleMapper">
+
+    <select id="getArticleList" resultType="com.github.an001code.blog.pojo.Article">
+           select a.*, t.tag_name
+           from article a
+           left join tag t
+           on a.tag_id = t.tag_id
+           <where>
+               <if test="query != null and query != ''">
+                   a.title like concat('%',#{query},'%')
+               </if>
+               <if test="articleId != null">
+                   and a.article_id = #{articleId}
+               </if>
+               <if test="userId != null">
+                   and a.user_id = #{userId}
+               </if>
+               <if test="tag != null and tag != ''">
+                   and t.tag_name = #{tag}
+               </if>
+               <if test="status != null">
+                   and a.status = #{status}
+               </if>
+               <if test="isDeleted != null">
+                   and a.is_deleted = #{isDeleted}
+               </if>
+               <if test="begin != null and end != null">
+                   and DATE(a.updated_at) between #{begin} and #{end}
+               </if>
+           </where>
+           order by a.updated_at desc
+    </select>
+</mapper>

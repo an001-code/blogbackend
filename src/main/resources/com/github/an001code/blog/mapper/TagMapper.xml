@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.an001code.blog.mapper.TagMapper">
+
+    <select id="getTagList" resultType="com.github.an001code.blog.pojo.Tag">
+        select *
+        from tag
+        <where>
+            <if test="begin != null and end != null">
+                DATE(updated_at) between #{begin} and #{end}
+            </if>
+        </where>
+        order by updated_at desc
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="tagId">
+        insert into tag(tag_name,status) values(#{tagName},#{status})
+    </insert>
+
+    <update id="update" useGeneratedKeys="true" keyProperty="tagId">
+        update tag
+        <set>
+            <if test="tagName != null and tagName != ''">
+                tag_name = #{tagName},
+            </if>
+            <if test="useCount != null">
+                use_count = #{useCount},
+            </if>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </set>
+        where tag_id = #{tagId}
+    </update>
+
+    <delete id="delete">
+        delete from tag
+        where tag_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

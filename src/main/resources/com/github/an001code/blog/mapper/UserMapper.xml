@@ -20,10 +20,10 @@
                and status = #{status}
            </if>
            <if test="begin != null and end != null">
-               and DATE(created_at) between #{begin} and #{end}
+               and DATE(updated_at) between #{begin} and #{end}
            </if>
        </where>
-            order by created_at desc
+            order by updated_at desc
     </select>
 
 
