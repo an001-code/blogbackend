@@ -1,8 +1,6 @@
 package com.github.an001code.blog.controller;
 
-import com.github.an001code.blog.pojo.Article;
-import com.github.an001code.blog.pojo.ArticlePageBean;
-import com.github.an001code.blog.pojo.Result;
+import com.github.an001code.blog.pojo.*;
 import com.github.an001code.blog.service.ArticleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -18,32 +17,18 @@ public class ArticleController {
     ArticleService articleService;
 
     /**
-     * 标签列表查询
-     * @param query
-     * @param articleId
-     * @param userId
-     * @param tag
-     * @param status
-     * @param isDeleted
-     * @param begin
-     * @param end
-     * @param page
-     * @param pageSize
+     * 文章列表查询
+     * @param articleQuery
      * @return
      */
     @GetMapping("/articles/select")
-    public Result getArticleList(String query, Integer articleId, Integer userId, String tag,
-                                 Integer status, Integer isDeleted,
-                                 @DateTimeFormat(pattern = "yy-MM-dd") LocalDate begin,
-                                 @DateTimeFormat(pattern = "yy-MM-dd")LocalDate end,
-                                 @RequestParam(defaultValue = "1") Integer page,
-                                 @RequestParam(defaultValue = "10") Integer pageSize){
+    public Result getArticleList(ArticleQuery articleQuery){
             log.info("进入getArticleList");
-            if(status == null){
+            if(articleQuery.getStatus() == null){
                 return Result.error("status不能为空");
             }
-           ArticlePageBean articlePageBean = articleService.getArticleList(query,articleId,userId,tag,status,isDeleted,begin,end,page,pageSize);
-            return Result.success(articlePageBean);
+           PageResult<Article> pageResult = articleService.getArticleList(articleQuery);
+            return Result.success(pageResult);
     }
 
     /**
@@ -79,18 +64,38 @@ public class ArticleController {
         return Result.success();
     }
 
+    /**
+     * 文章修改
+     * @param articleQuery
+     * @return
+     */
     @PutMapping("/articles")
-    public Result update(@RequestBody Article article){
+    public Result update(@RequestBody ArticleQuery articleQuery){
         log.info("进入update");
-        if(article.getArticleId() == null){
+        if(articleQuery.getArticleId() == null){
             return Result.error("articleId不能为空");
         }
-        int affectRows = articleService.update(article);
+        int affectRows = articleService.update(articleQuery);
         if(affectRows < 1){
             return Result.error("修改失败");
         }
         return Result.success();
     }
+
+    /**
+     * 文章删除（逻辑删除）
+     * @param ids
+     * @return
+     */
+    @DeleteMapping("/articles/{ids}")
+    public Result delete(@PathVariable List<Integer> ids){
+        log.info("进入delete");
+        if(articleService.delete(ids)){
+            return Result.success();
+        }
+        return Result.error("删除失败");
+    }
+
 
 
 }

@@ -1,16 +1,19 @@
 package com.github.an001code.blog.service;
 
 import com.github.an001code.blog.pojo.Article;
-import com.github.an001code.blog.pojo.ArticlePageBean;
+import com.github.an001code.blog.pojo.ArticleQuery;
+import com.github.an001code.blog.pojo.PageResult;
 
-import java.time.LocalDate;
+import java.util.List;
 
 public interface ArticleService {
-    ArticlePageBean getArticleList(String query, Integer articleId, Integer userId, String tag, Integer status, Integer isDeleted, LocalDate begin, LocalDate end, Integer page, Integer pageSize);
+    PageResult<Article> getArticleList(ArticleQuery articleQuery);
 
     Article getById(Long id);
 
     int addArticle(Article article);
 
-    int update(Article article);
+    int update(ArticleQuery articleQuery);
+
+    boolean delete(List<Integer> ids);
 }

@@ -1,10 +1,7 @@
 package com.github.an001code.blog.service.impl;
 
 import com.github.an001code.blog.mapper.TagMapper;
-import com.github.an001code.blog.pojo.Tag;
-import com.github.an001code.blog.pojo.TagPageBean;
-import com.github.an001code.blog.pojo.User;
-import com.github.an001code.blog.pojo.UserPageBean;
+import com.github.an001code.blog.pojo.*;
 import com.github.an001code.blog.service.TagService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -22,12 +19,12 @@ public class TagServiceImpl implements TagService {
     TagMapper tagMapper;
 
     @Override
-    public TagPageBean getTagList(LocalDate begin, LocalDate end, Integer page, Integer pageSize) {
-        PageHelper.startPage(page,pageSize);
-        List<Tag> tagList = tagMapper.getTagList(begin,end);
+    public PageResult<Tag> getTagList(TagQuery tagQuery) {
+        PageHelper.startPage(tagQuery.getPage(),tagQuery.getPageSize());
+        List<Tag> tagList = tagMapper.getTagList(tagQuery);
         Page<Tag> p = (Page<Tag>) tagList;
-        TagPageBean tagPageBean = new TagPageBean(p.getTotal(),p.getResult());
-        return tagPageBean;
+        PageResult<Tag> tagPage = new PageResult<>(p.getTotal(),p.getResult());
+        return tagPage;
 
     }
 
@@ -67,5 +64,15 @@ public class TagServiceImpl implements TagService {
             return false;
         }
         return true;
+    }
+
+    //增加使用数量
+    public void increaseUseCount(Long id){
+        tagMapper.increaseUseCount(id);
+    }
+
+    //
+    public void decreaseUseCount(Long id){
+        tagMapper.decreaseUseCount(id);
     }
 }

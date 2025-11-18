@@ -1,9 +1,6 @@
 package com.github.an001code.blog.controller;
 
-import com.github.an001code.blog.pojo.PasswordUpdateDTO;
-import com.github.an001code.blog.pojo.Result;
-import com.github.an001code.blog.pojo.User;
-import com.github.an001code.blog.pojo.UserPageBean;
+import com.github.an001code.blog.pojo.*;
 import com.github.an001code.blog.service.UserService;
 import com.sun.istack.NotNull;
 import jakarta.validation.Valid;
@@ -25,28 +22,18 @@ public class UserController {
 
     /**
      * 用户列表查询
-     * @param query
-     * @param userId
-     * @param status
-     * @param begin
-     * @param end
-     * @param page
-     * @param pageSize
+     * @param userQuery
      * @return
      */
         @GetMapping("/users/select")
-        public Result getUserList(String query, Integer userId,  Integer status,
-                                  @DateTimeFormat(pattern = "yy-MM-dd")LocalDate begin,
-                                  @DateTimeFormat(pattern = "yy-MM-dd")LocalDate end,
-                                  @RequestParam(defaultValue = "1") Integer page,
-                                  @RequestParam(defaultValue = "10") Integer pageSize){
+        public Result getUserList(UserQuery userQuery){
             log.info("进入getUserList");
-            if(status == null){
+            if(userQuery.getStatus() == null){
                 return Result.error("status不能为空");
             }
-            UserPageBean userPageBean = userService.getUserList(query,userId,status,begin,end,page,pageSize);
+            PageResult<User> userPage = userService.getUserList(userQuery);
             log.info("得到userPageBean");
-            return Result.success(userPageBean);
+            return Result.success(userPage);
         }
 
     /**
@@ -90,16 +77,16 @@ public class UserController {
 
     /**
      * 用户信息更改
-     * @param user
+     * @param userQuery
      * @return
      */
     @PutMapping("/users")
-        public Result updateUser(@RequestBody User user){
+        public Result updateUser(@RequestBody UserQuery userQuery){
             log.info("进入updateUser");
-            if(user.getUserId() == null){
+            if(userQuery.getUserId() == null){
                 return Result.error("id不能为空");
             }
-            if(userService.updateById(user)){
+            if(userService.updateById(userQuery)){
                 return Result.success();
             }
             else{

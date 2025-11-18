@@ -2,6 +2,7 @@ package com.github.an001code.blog.mapper;
 
 
 import com.github.an001code.blog.pojo.User;
+import com.github.an001code.blog.pojo.UserQuery;
 import jakarta.validation.constraints.NotNull;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -14,7 +15,7 @@ import java.util.List;
 public interface UserMapper {
 
 
-    List<User> getUserList(String query, Integer userId, Integer status, LocalDate begin,LocalDate end);
+    List<User> getUserList(UserQuery userQuery);
 
     @Select("select * from user where user_id = #{id}")
     User getById(Integer id);
@@ -31,7 +32,7 @@ public interface UserMapper {
     @Update("update user set identifier = #{identifier} where user_id = #{id}")
     void updateIdentifier(Long id, String identifier);
 
-    int updateById(User user);
+    int updateById(UserQuery userQuery);
 
     @Update("update user set password = #{newEncodedPassword} where user_id = #{userId}")
     int updatePassword(@NotNull(message = "用户ID不能为空") Long userId, String newEncodedPassword);

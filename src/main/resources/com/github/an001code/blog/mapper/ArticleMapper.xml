@@ -61,7 +61,29 @@
             <if test="status != null">
                 status = #{status},
             </if>
-            
+            <if test="viewCount != null">
+                view_count = #{viewCount},
+            </if>
+            <if test="likeCount != null">
+                like_count = #{likeCount},
+            </if>
+            <if test="favoriteCount != null">
+                favorite_count = #{favoriteCount},
+            </if>
+            <if test="commentCount != null">
+                comment_count = #{commentCount},
+            </if>
+            <if test="publishedAt != null">
+                published_at = #{publishedAt}
+            </if>
         </set>
+         where article_id = #{articleId}
+    </update>
+    <update id="logicDelete">
+        update article set is_deleted = 1
+        where article_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
     </update>
 </mapper>

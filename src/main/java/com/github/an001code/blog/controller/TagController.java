@@ -1,8 +1,6 @@
 package com.github.an001code.blog.controller;
 
-import com.github.an001code.blog.pojo.Result;
-import com.github.an001code.blog.pojo.Tag;
-import com.github.an001code.blog.pojo.TagPageBean;
+import com.github.an001code.blog.pojo.*;
 import com.github.an001code.blog.service.TagService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,22 +17,16 @@ public class TagController {
     TagService tagService;
 
     /**
-     * 标签列表查询
-     * @param begin
-     * @param end
-     * @param page
-     * @param pageSize
+     * 标签类别查询
+     * @param tagQuery
      * @return
      */
     @GetMapping("/tags/select")
-    public Result getTagList(@DateTimeFormat(pattern = "yy-MM-dd") LocalDate begin,
-                             @DateTimeFormat(pattern = "yy-MM-dd")LocalDate end,
-                             @RequestParam(defaultValue = "1") Integer page,
-                             @RequestParam(defaultValue = "10") Integer pageSize){
+    public Result getTagList(TagQuery tagQuery){
         log.info("进入getTagList");
-        TagPageBean tagPageBean = tagService.getTagList(begin,end,page,pageSize);
+        PageResult<Tag> tagPage = tagService.getTagList(tagQuery);
         log.info("得到pageBean");
-        return Result.success(tagPageBean);
+        return Result.success(tagPage);
 
     }
 

@@ -1,9 +1,7 @@
 package com.github.an001code.blog.service.impl;
 
 import com.github.an001code.blog.mapper.UserMapper;
-import com.github.an001code.blog.pojo.PasswordUpdateDTO;
-import com.github.an001code.blog.pojo.User;
-import com.github.an001code.blog.pojo.UserPageBean;
+import com.github.an001code.blog.pojo.*;
 import com.github.an001code.blog.service.UserService;
 import com.github.an001code.blog.utils.IdentifierUtils;
 import com.github.pagehelper.Page;
@@ -29,12 +27,12 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserPageBean getUserList(String query, Integer userId, Integer status, LocalDate begin, LocalDate end, Integer page, Integer pageSize) {
-        PageHelper.startPage(page,pageSize);
-        List<User> userList = userMapper.getUserList(query,userId,status,begin,end);
+    public PageResult<User> getUserList(UserQuery userQuery) {
+        PageHelper.startPage(userQuery.getPage(),userQuery.getPageSize());
+        List<User> userList = userMapper.getUserList(userQuery);
         Page<User> p = (Page<User>) userList;
-        UserPageBean userPageBean = new UserPageBean(p.getTotal(),p.getResult());
-        return userPageBean;
+        PageResult<User> userPage = new PageResult<>(p.getTotal(),p.getResult());
+        return userPage;
     }
 
     @Override
@@ -67,8 +65,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean updateById(User user) {
-        int affectRows = userMapper.updateById(user);
+    public boolean updateById(UserQuery userQuery) {
+        int affectRows = userMapper.updateById(userQuery);
         if(affectRows < 1){
             return false;
         }

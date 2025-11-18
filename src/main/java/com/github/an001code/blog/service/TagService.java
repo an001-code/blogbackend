@@ -1,13 +1,13 @@
 package com.github.an001code.blog.service;
 
+import com.github.an001code.blog.pojo.PageResult;
 import com.github.an001code.blog.pojo.Tag;
-import com.github.an001code.blog.pojo.TagPageBean;
+import com.github.an001code.blog.pojo.TagQuery;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface TagService {
-    TagPageBean getTagList(LocalDate begin, LocalDate end, Integer page, Integer pageSize);
+    PageResult<Tag> getTagList(TagQuery tagQuery);
 
     Tag getById(Long id);
 
