@@ -77,36 +77,43 @@ public class ArticleServiceImpl implements ArticleService {
 
 
     //增加阅读量
+    @Override
     public void increaseViewCount(Long id){
         articleMapper.increaseViewCount(id);
     }
 
     //增加点赞量
+    @Override
     public void increaseLikeCount(Long id){
         articleMapper.increaseLikeCount(id);
     }
 
     //增加收藏量
+    @Override
     public void increaseFavoriteCount(Long id){
         articleMapper.increaseFavoriteCount(id);
     }
 
     //增加评论量
+    @Override
     public void increaseCommentCount(Long id){
         articleMapper.increaseCommentCount(id);
     }
 
     //减少点赞量
+    @Override
     public void decreaseLikeCount(Long id){
         articleMapper.decreaseLikeCount(id);
     }
 
     //减少收藏量
+    @Override
     public void decreaseFavoriteCount(Long id){
         articleMapper.decreaseFavoriteCount(id);
     }
 
     //减少评论量
+    @Override
     public void decreaseCommentCount(Long id){
         articleMapper.decreaseCommentCount(id);
     }

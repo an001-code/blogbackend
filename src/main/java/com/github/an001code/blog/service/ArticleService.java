@@ -16,4 +16,25 @@ public interface ArticleService {
     int update(ArticleQuery articleQuery);
 
     boolean delete(List<Integer> ids);
+
+    //增加阅读量
+     void increaseViewCount(Long id);
+
+    //增加点赞量
+     void increaseLikeCount(Long id);
+
+    //增加收藏量
+     void increaseFavoriteCount(Long id);
+
+    //增加评论量
+    void increaseCommentCount(Long id);
+
+    //减少点赞量
+     void decreaseLikeCount(Long id);
+
+    //减少收藏量
+     void decreaseFavoriteCount(Long id);
+
+    //减少评论量
+    void decreaseCommentCount(Long id);
 }
