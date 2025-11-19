@@ -117,4 +117,12 @@ public class ArticleServiceImpl implements ArticleService {
     public void decreaseCommentCount(Long id){
         articleMapper.decreaseCommentCount(id);
     }
+
+    @Override
+//  根据i减少相应评论量
+    public void decreaseCommentCounts(Long key, int i) {
+        articleMapper.decreaseCommentCounts(key,i);
+    }
+
+
 }

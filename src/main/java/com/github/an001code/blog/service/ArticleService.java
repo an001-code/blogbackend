@@ -37,4 +37,6 @@ public interface ArticleService {
 
     //减少评论量
     void decreaseCommentCount(Long id);
+//  按键值减少评论量
+    void decreaseCommentCounts(Long key, int i);
 }

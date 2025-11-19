@@ -3,6 +3,7 @@ package com.github.an001code.blog.mapper;
 import com.github.an001code.blog.pojo.Article;
 import com.github.an001code.blog.pojo.ArticleQuery;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -49,4 +50,5 @@ public interface ArticleMapper {
     void decreaseCommentCount(Long id);
 
 
+    void decreaseCommentCounts(@Param("articleId") Long key, @Param("count") int i);
 }

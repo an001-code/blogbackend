@@ -3,6 +3,26 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.an001code.blog.mapper.CommentMapper">
+    <insert id="addComment" useGeneratedKeys="true" keyProperty="commentId">
+        insert into comment(article_id,user_id,parent_id,content,created_at,updated_at)
+        values(#{articleId},#{userId},#{parentId},#{content},#{createdAt},#{updatedAt})
+    </insert>
+    <update id="logicDeleteComment">
+        update comment
+        set is_deleted = 1
+        where comment_id = #{id}
+    </update>
+    <update id="batchLogicDelete">
+        update comment
+        set is_deleted = 1
+        where comment_id in
+        <foreach item="id" collection="ids" separator="," close=")" open="(" index="">
+            #{id}
+        </foreach>
+    </update>
+    <delete id="deleteComment">
+
+    </delete>
 
 
     <select id="getCommentList" resultType="com.github.an001code.blog.pojo.Comment">
@@ -18,10 +38,32 @@
             <if test="parentId != null">
                 and parent_id = #{parentId}
             </if>
-            <if test="isDeleted != null">
-                and is_deleted = #{isDeleted}
-            </if>
+
         </where>
         order by updated_at desc
+    </select>
+    <select id="getById" resultType="com.github.an001code.blog.pojo.Comment">
+        select *
+        from comment
+        where comment_id = #{id}
+    </select>
+    <select id="getChildCommentList" resultType="com.github.an001code.blog.pojo.Comment">
+        select *
+        from comment
+        where parent_id = #{id}
+    </select>
+    <select id="getAllDescendantsAndSelf" resultType="com.github.an001code.blog.pojo.Comment">
+        WITH RECURSIVE comment_tree AS (
+        -- 锚点：多个起始节点
+        SELECT * FROM comment WHERE comment_id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        UNION ALL
+        -- 递归部分不变
+        SELECT c.* FROM comment c
+        INNER JOIN comment_tree ct ON c.parent_id = ct.comment_id
+        )
+        SELECT * FROM comment_tree;
     </select>
 </mapper>

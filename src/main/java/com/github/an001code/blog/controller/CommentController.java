@@ -8,9 +8,9 @@ import com.github.an001code.blog.pojo.Result;
 import com.github.an001code.blog.service.CommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -24,6 +24,27 @@ public class CommentController {
         log.info("分页查询评论列表,{}",commentQuery);
         PageResult<Comment> pageResult = commentService.getCommentList(commentQuery);
         return Result.success(pageResult);
+    }
+//  添加评论
+    @PostMapping("/comments")
+    public Result addComment(@RequestBody Comment comment){
+        log.info("添加评论,{}",comment);
+        Integer affectRows = commentService.addComment(comment);
+        if(affectRows < 1){
+            return Result.error("评论添加失败");
+        }
+        return Result.success("评论添加成功");
+    }
+
+//   根据ids批量删除评论（逻辑删除）
+    @DeleteMapping("/comments")
+    public Result delete(@RequestParam List<Integer> ids){
+        log.info("批量删除评论,{}",ids);
+        boolean affectRows = commentService.delete(ids);
+        if(!affectRows){
+            return Result.error("评论删除失败");
+        }
+        return Result.success("评论删除成功");
     }
 
 
