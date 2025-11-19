@@ -7,11 +7,7 @@
         insert into comment(article_id,user_id,parent_id,content,created_at,updated_at)
         values(#{articleId},#{userId},#{parentId},#{content},#{createdAt},#{updatedAt})
     </insert>
-    <update id="logicDeleteComment">
-        update comment
-        set is_deleted = 1
-        where comment_id = #{id}
-    </update>
+
     <update id="batchLogicDelete">
         update comment
         set is_deleted = 1
@@ -20,8 +16,12 @@
             #{id}
         </foreach>
     </update>
-    <delete id="deleteComment">
-
+    <delete id="deleteComments">
+        delete from comment
+        where comment_id in
+        <foreach item="id" collection="ids" separator="," close=")" open="(" index="">
+            #{id}
+        </foreach>
     </delete>
 
 
@@ -38,10 +38,10 @@
             <if test="parentId != null">
                 and parent_id = #{parentId}
             </if>
-
         </where>
         order by updated_at desc
     </select>
+
     <select id="getById" resultType="com.github.an001code.blog.pojo.Comment">
         select *
         from comment

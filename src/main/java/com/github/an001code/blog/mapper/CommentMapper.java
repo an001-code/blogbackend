@@ -14,13 +14,11 @@ public interface CommentMapper {
 
     Integer addComment(Comment comment);
 
-    void deleteComment(Integer id);
+    void deleteComments(@Param("ids") List<Long> commentIdsToDelete);
 
     Comment getById(Integer id);
 
     List<Comment> getChildCommentList(Integer id);
-
-    void logicDeleteComment(Integer id);
 
     List<Comment> getAllDescendantsAndSelf(@Param("ids") List<Integer> ids);
 
