@@ -9,6 +9,9 @@ import java.util.List;
 public interface ArticleService {
     PageResult<Article> getArticleList(ArticleQuery articleQuery);
 
+    //根据文章id列表查询收藏文章
+    List<Article> getFavoriteList(List<Long> articleIdList);
+
     Article getById(Long id);
 
     int addArticle(Article article);

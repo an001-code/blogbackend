@@ -32,6 +32,13 @@ public class ArticleServiceImpl implements ArticleService {
         return pageResult;
     }
 
+    //根据文章id列表查询收藏文章
+    @Override
+    public List<Article> getFavoriteList(List<Long> articleIdList){
+        List<Article> articleList = articleMapper.getFavortieList(articleIdList);
+        return articleList;
+    }
+
 
     @Override
     @Transactional

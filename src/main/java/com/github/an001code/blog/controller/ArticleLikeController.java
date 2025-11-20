@@ -15,6 +15,11 @@ public class ArticleLikeController {
     @Autowired
     ArticleLikeService articleLikeService;
 
+    /**
+     * 点赞状态切换
+     * @param articleLike
+     * @return
+     */
     @PostMapping("/article-like")
     public Result toggleLike(@RequestBody ArticleLike articleLike){
         if(articleLike.getArticleId() == null || articleLike.getUserId() == null){

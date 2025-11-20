@@ -51,4 +51,6 @@ public interface ArticleMapper {
 
 
     void decreaseCommentCounts(@Param("articleId") Long key, @Param("count") int i);
+
+    List<Article> getFavortieList(List<Long> articleIdList);
 }

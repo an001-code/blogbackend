@@ -35,6 +35,23 @@
            order by a.updated_at desc
     </select>
 
+    <select id="getFavortieList" resultType="com.github.an001code.blog.pojo.Article">
+        select * from article
+        where 1=1
+        <if test="articleIdList != null and articleIdList.size() > 0">
+            and article_id in
+            <foreach collection="articleIdList" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </if>
+        <if test="articleIdList == null or articleIdList.size() == 0">
+            and 1=0  <!-- 如果没有ID，返回空结果 -->
+        </if>
+    </select>
+
+
+
+
     <insert id="insert">
         insert into article (user_id,tag_id,title,content,summary,cover_image,status,published_at)
         values (#{userId},#{tagId},#{title},#{content},#{summary},#{coverImage},#{status},#{publishedAt})
