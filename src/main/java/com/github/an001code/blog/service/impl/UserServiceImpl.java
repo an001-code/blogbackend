@@ -4,6 +4,7 @@ import com.github.an001code.blog.mapper.UserMapper;
 import com.github.an001code.blog.pojo.*;
 import com.github.an001code.blog.service.UserService;
 import com.github.an001code.blog.utils.IdentifierUtils;
+import com.github.an001code.blog.utils.JwtUtils;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import jakarta.transaction.Transactional;
@@ -12,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
-import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -28,10 +29,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageResult<User> getUserList(UserQuery userQuery) {
-        PageHelper.startPage(userQuery.getPage(),userQuery.getPageSize());
+        PageHelper.startPage(userQuery.getPage(), userQuery.getPageSize());
         List<User> userList = userMapper.getUserList(userQuery);
         Page<User> p = (Page<User>) userList;
-        PageResult<User> userPage = new PageResult<>(p.getTotal(),p.getResult());
+        PageResult<User> userPage = new PageResult<>(p.getTotal(), p.getResult());
         return userPage;
     }
 
@@ -45,29 +46,29 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Long addUser(User user) {
-          if(userMapper.getByEmail(user.getEmail()) !=null){  //检验账号是否被注册过
-              return -1L;
-          }
-          // 加密密码
-          if(user.getPassword().equals("")){
-             return -1L;
-          }
-          String encodedPassword = passwordEncoder.encode(user.getPassword());
-          user.setPassword(encodedPassword);
-          int row = userMapper.insert(user);
-          Long id = user.getUserId();    //获取新注册账号的id
-          System.out.println(id);
-          if(id!=null){
-              String identifier = IdentifierUtils.generateIdentifier(id); //生成相应的特征码
-              userMapper.updateIdentifier(id,identifier);
-          }
-          return id;
+        if (userMapper.getByEmail(user.getEmail()) != null) {  //检验账号是否被注册过
+            return -1L;
+        }
+        // 加密密码
+        if (user.getPassword().equals("")) {
+            return -1L;
+        }
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        int row = userMapper.insert(user);
+        Long id = user.getUserId();    //获取新注册账号的id
+        System.out.println(id);
+        if (id != null) {
+            String identifier = IdentifierUtils.generateIdentifier(id); //生成相应的特征码
+            userMapper.updateIdentifier(id, identifier);
+        }
+        return id;
     }
 
     @Override
     public boolean updateById(UserQuery userQuery) {
         int affectRows = userMapper.updateById(userQuery);
-        if(affectRows < 1){
+        if (affectRows < 1) {
             return false;
         }
         return true;
@@ -76,26 +77,41 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public boolean updatePassword(PasswordUpdateDTO updateDTO) {
-            String savedPassword = userMapper.getPasswordById(updateDTO.getUserId());//获取旧的加密密码
-            if(passwordEncoder.matches(updateDTO.getOldPassword(),savedPassword)){    //验证密码是否正确
-                String newEncodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());    //产生新的密码
-                int effectRows = userMapper.updatePassword(updateDTO.getUserId(),newEncodedPassword);
-                if(effectRows <1){
-                    return false;
-                }
-                return true;
-            }
-            else{
+        String savedPassword = userMapper.getPasswordById(updateDTO.getUserId());//获取旧的加密密码
+        if (passwordEncoder.matches(updateDTO.getOldPassword(), savedPassword)) {    //验证密码是否正确
+            String newEncodedPassword = passwordEncoder.encode(updateDTO.getNewPassword());    //产生新的密码
+            int effectRows = userMapper.updatePassword(updateDTO.getUserId(), newEncodedPassword);
+            if (effectRows < 1) {
                 return false;
             }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
     public boolean delete(List<Long> ids) {
-          int effectRows = userMapper.delete(ids);
-          if(effectRows < 1){
-              return false;
-          }
-          return true;
+        int effectRows = userMapper.delete(ids);
+        if (effectRows < 1) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public User login(User user) {
+        User u = userMapper.getByEmailandPassword(user.getEmail(), user.getPassword());
+        if (u != null) {
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("id", u.getUserId());
+            claims.put("email", u.getEmail());
+            String jwt = JwtUtils.generateJwt(claims);
+            u.setJwt(jwt);
+            u.setPassword(null);
+            u.setEmail(null);
+            return u;
+        }
+        return null;
     }
 }

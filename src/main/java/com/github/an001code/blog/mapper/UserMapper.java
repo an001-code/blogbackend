@@ -38,4 +38,6 @@ public interface UserMapper {
     int updatePassword(@NotNull(message = "用户ID不能为空") Long userId, String newEncodedPassword);
 
     int delete(List<Long> ids);
+
+    User getByEmailandPassword(String email, String password);
 }

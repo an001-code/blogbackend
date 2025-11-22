@@ -25,7 +25,7 @@ public class Article {
     private String content; //内容
     private String summary; //摘要
     private String coverImage;  //封面图片
-    private Integer status = 0;  //文章状态，0为草稿，1为已发布
+    private Integer status = 1;  //文章状态，0为草稿，1为已发布
     private Integer viewCount = 0; //阅读量
     private Integer likeCount = 0;  //点赞量
     private Integer favoriteCount = 0;  //收藏量

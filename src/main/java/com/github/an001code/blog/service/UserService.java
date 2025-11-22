@@ -2,7 +2,6 @@ package com.github.an001code.blog.service;
 
 import com.github.an001code.blog.pojo.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface UserService {
@@ -17,4 +16,6 @@ public interface UserService {
     boolean updatePassword(PasswordUpdateDTO updateDTO);
 
     boolean delete(List<Long> ids);
+
+    User login(User user);
 }
