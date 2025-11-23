@@ -7,28 +7,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-@RequestMapping("/login")
-public class LoginController {
+public class RegisterController {
     @Autowired
-    private UserService userService;
+    UserService userService;
 
-    /*用户登陆*/
-    @PostMapping
-    public Result login(@RequestBody User user) {
-        log.info("用户登陆");
-        if(user.getEmail()==null || user.getPassword()==null){
+    @PostMapping("/register")
+    public Result register(@RequestBody User user){
+        if(user.getPassword() == null || user.getEmail() == null){
             return Result.error("登录失败");
         }
-        User u =userService.login(user);
-        if(u != null){
-            return Result.success(u);
+        User u = userService.register(user);
+        if(u == null){
+            return Result.error("ACCOUNT ALREADY EXISTS");
         }
-        return Result.error("登陆失败");
+        return Result.success(u);
     }
-
 }

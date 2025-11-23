@@ -39,5 +39,6 @@ public interface UserMapper {
 
     int delete(List<Long> ids);
 
-    User getByEmailandPassword(String email, String password);
+
+
 }

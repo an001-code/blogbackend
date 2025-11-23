@@ -25,12 +25,6 @@
        </where>
             order by updated_at desc
     </select>
-    <select id="getByEmailandPassword" resultType="com.github.an001code.blog.pojo.User">
-        select user_id,identifier,user_name,email,role,status,avatar,gender,birthday,signature,
-              created_at,updated_at
-        from user
-        where email = #{email} and password = #{password}
-    </select>
 
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
@@ -56,7 +50,7 @@
             <if test="gender != null">
                 gender = #{gender},
             </if>
-            <if test="birthday != null and birthday != ''">
+            <if test="birthday != null">
                 birthday = #{birthday},
             </if>
             <if test="signature != null and signature != ''">

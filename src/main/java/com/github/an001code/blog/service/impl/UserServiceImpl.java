@@ -49,6 +49,9 @@ public class UserServiceImpl implements UserService {
         if (userMapper.getByEmail(user.getEmail()) != null) {  //检验账号是否被注册过
             return -1L;
         }
+        if(user.getUserName() == null){
+            user.setUserName(user.getEmail());
+        }
         // 加密密码
         if (user.getPassword().equals("")) {
             return -1L;
@@ -101,17 +104,43 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User login(User user) {
-        User u = userMapper.getByEmailandPassword(user.getEmail(), user.getPassword());
-        if (u != null) {
+        User u = userMapper.getByEmail(user.getEmail());
+        if(u == null) {
+            return null;  // 用户不存在
+        }
+        String savedPassword = u.getPassword();
+        if(!passwordEncoder.matches(user.getPassword(), savedPassword)){      //验证密码
+            return null;
+        }
+        else{
             Map<String, Object> claims = new HashMap<>();
             claims.put("id", u.getUserId());
             claims.put("email", u.getEmail());
             String jwt = JwtUtils.generateJwt(claims);
             u.setJwt(jwt);
             u.setPassword(null);
-            u.setEmail(null);
             return u;
         }
-        return null;
+    }
+
+    @Override
+    @Transactional
+    public User register(User user) {
+        Long l = addUser(user);
+        User u = new User();
+        if(l<=0){
+            return u;
+        }
+        u = userMapper.getByEmail(user.getEmail());
+        if(u == null){
+            return u;
+        }
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", u.getUserId());
+        claims.put("email", u.getEmail());
+        String jwt = JwtUtils.generateJwt(claims);
+        u.setJwt(jwt);
+        u.setPassword(null);
+        return u;
     }
 }

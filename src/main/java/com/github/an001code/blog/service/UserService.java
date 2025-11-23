@@ -18,4 +18,6 @@ public interface UserService {
     boolean delete(List<Long> ids);
 
     User login(User user);
+
+    User register(User user);
 }
