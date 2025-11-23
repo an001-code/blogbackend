@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.an001code.blog.mapper.FollowMapper">
+    <insert id="addfollow" useGeneratedKeys="true" keyProperty="followId">
+        insert into user_follow(follower_id,following_id,status)
+        values(#{followerId},#{followingId},#{status})
+    </insert>
+
+
+    <update id="updateFollow">
+        update user_follow
+        <set>
+            <if test="followerId != null">
+                follower_id = #{followerId},
+            </if>
+            <if test="followingId != null">
+                following_id = #{followingId},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+        </set>
+        where follower_id = #{followerId} and following_id = #{followingId}
+    </update>
+    <select id="getFollow" resultType="com.github.an001code.blog.pojo.Follow">
+        select * from user_follow where follower_id = #{followerId} and following_id = #{followingId}
+    </select>
+    <select id="getFollowingListByFollowerId" resultType="com.github.an001code.blog.pojo.User">
+        select u.* from user_follow f
+        left join user u on f.following_id = u.user_id
+        where f.follower_id = #{followerId} and f.status = 1 and u.status = 0
+    </select>
+    <select id="getFollowerList" resultType="com.github.an001code.blog.pojo.User">
+        select u.* from user_follow f
+        left join user u on f.follower_id = u.user_id
+        where f.following_id = #{followingId} and f.status = 1 and u.status = 0
+    </select>
+</mapper>
