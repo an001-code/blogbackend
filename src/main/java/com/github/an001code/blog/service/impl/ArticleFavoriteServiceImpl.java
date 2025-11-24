@@ -31,13 +31,13 @@ public class ArticleFavoriteServiceImpl implements ArticleFavoriteService {
             if(affectRows < 1) return false;
         }
         else{
-            if(favorite.getStatus() == 0){      //未收藏，重新点赞
+            if(favorite.getStatus() == 0){      //未收藏，重新收藏
                 favorite.setStatus(1);
                 int affectRows = articleFavortieMapper.update(favorite);
                 articleService.increaseFavoriteCount(favorite.getArticleId()); //增加文章收藏量
                 if(affectRows < 1) return false;
             }
-            else{                                 //已经收藏，取消点赞
+            else{                                 //已经收藏，取消收藏
                 favorite.setStatus(0);
                 int affectRows = articleFavortieMapper.update(favorite);
                 articleService.decreaseFavoriteCount(favorite.getArticleId());   //减少文章收藏量
