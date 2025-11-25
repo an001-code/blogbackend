@@ -21,6 +21,6 @@ public interface ArticleFavortieMapper {
     @Update("update article_favorite set status = #{status} where article_id = #{articleId} and user_id = #{userId}")
     int update(ArticleFavorite articleFavortie);
 
-    @Select("select article_id from article_favorite where user_Id = #{userId}")
+    @Select("select article_id from article_favorite where user_Id = #{userId} and status = 1")
     List<Long> getArticleIdList(ArticleFavoriteQuery favoriteQuery);
 }
