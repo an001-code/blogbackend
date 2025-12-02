@@ -24,7 +24,7 @@ public class User {
     private String password;//密码
     private Integer role = 0;//用户身份，0为普通用户，1为管理员
     private Integer status = 0;//用户状态，0为正常，1为禁用
-    private String avatar;//头像
+    private String avatar="https://anonce1.oss-cn-beijing.aliyuncs.com/28a74996-3fbe-4bff-acfc-a79e64e4ed47.png";//头像
     private Integer gender = 0;//性别，0为保密，1为男，2为女
     private LocalDate birthday;//生日
     private String signature;//签名
