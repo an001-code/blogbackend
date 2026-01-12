@@ -28,9 +28,6 @@ public class UserController {
         @GetMapping("/users/select")
         public Result getUserList(UserQuery userQuery){
             log.info("进入getUserList");
-            if(userQuery.getStatus() == null){
-                return Result.error("status不能为空");
-            }
             PageResult<User> userPage = userService.getUserList(userQuery);
             log.info("得到userPageBean");
             return Result.success(userPage);
