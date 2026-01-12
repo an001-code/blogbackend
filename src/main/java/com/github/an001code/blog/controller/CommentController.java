@@ -34,33 +34,13 @@ public class CommentController {
     public Result addComment(@RequestBody Comment comment, HttpServletRequest request) {
         log.info("添加评论,{}", comment);
 
-        // 1. 从请求头获取 token（字段名需与前端一致）
-        String token = request.getHeader("token");
-        if (token == null || token.trim().isEmpty()) {
-            return Result.error("请先登录");
-        }
-        try {
-            // 2. 解析 JWT 获取用户 ID
-            Claims claims = JwtUtils.parseJwt(token);
-            Integer userId = (Integer) claims.get("id"); // 确保登录时 put("id", ...)
-
-            if (userId == null) {
-                return Result.error("用户身份无效");
-            }
-
-            // 3. 设置必要字段（由后端控制，不信任前端传的 userId！）
-            comment.setUserId(Long.valueOf(userId));
-            // 4. 调用 service 保存
             Integer affectRows = commentService.addComment(comment);
             if (affectRows < 1) {
                 return Result.error("评论添加失败");
             }
             return Result.success("评论添加成功");
 
-        } catch (Exception e) {
-            log.error("解析 token 或保存评论失败", e);
-            return Result.error("评论失败，请登录后重试");
-        }
+
     }
 
     // 根据 ids 批量删除评论（逻辑删除）
