@@ -36,7 +36,7 @@ public class ArticleDetailCacheServiceImpl implements ArticleDetailCacheService 
     public void cacheArticle(Article article) {
         try{
             String key = ARTICLE_KEY_PREFIX + article.getArticleId();
-            redisTemplate.opsForValue().set(key,article,ARTICLE_TTL,TimeUnit.SECONDS);  //列表缓存30分钟
+            redisTemplate.opsForValue().set(key,article,ARTICLE_TTL,TimeUnit.SECONDS);
             log.debug("缓存文章：{}",article.getArticleId());
         }catch (Exception e){
             log.error("缓存文章失败: {}", article.getArticleId(), e);
