@@ -33,19 +33,9 @@ public class ArticleServiceImpl implements ArticleService {
     //获取文章列表
     @Override
     public PageResult<Article> getArticleList(ArticleQuery articleQuery) {
-        // 先尝试从缓存获取
-        List<Article> cachedArticles = articleListCacheService.getArticleListFromCache(articleQuery);
-        if (cachedArticles != null) {
-            log.info("文章列表缓存命中");
-            return new PageResult<>((long) cachedArticles.size(), cachedArticles);
-        }
 
         PageHelper.startPage(articleQuery.getPage(),articleQuery.getPageSize());
         List<Article> articles = articleMapper.getArticleList(articleQuery);
-        // 异步缓存结果
-        CompletableFuture.runAsync(() -> {
-            articleListCacheService.cacheArticleList(articleQuery, articles);
-        });
         Page<Article> p = (Page<Article>) articles;
         PageResult<Article> pageResult = new PageResult<>(p.getTotal(),p.getResult());
         return pageResult;

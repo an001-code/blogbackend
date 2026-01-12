@@ -31,7 +31,7 @@ public class ArticleListCacheServiceImpl implements ArticleListCacheService {
     public void cacheArticleList(ArticleQuery query, List<Article> articles) {
         try {
             String key = generateListKey(query);
-            redisTemplate.opsForValue().set(key, articles, TTL, TimeUnit.SECONDS); // 列表缓存1分钟
+            redisTemplate.opsForValue().set(key, articles, TTL, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("缓存文章列表失败", e);
         }
