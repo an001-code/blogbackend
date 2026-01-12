@@ -28,7 +28,8 @@
     <select id="getCommentList" resultType="com.github.an001code.blog.pojo.Comment">
         select *
         from comment
-        <where>
+       <where>
+           is_deleted = 0
             <if test="articleId != null">
                 and article_id = #{articleId}
             </if>
@@ -38,6 +39,7 @@
             <if test="parentId != null">
                 and parent_id = #{parentId}
             </if>
+
         </where>
         order by updated_at desc
     </select>

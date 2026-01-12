@@ -45,12 +45,10 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public int updateTag(Tag tag) {
-        if(tag.getTagName() != null){      //判断是否已经存在与要更改的标签名字一样的标签
-            String tagName = tag.getTagName();
-            Tag tmp = tagMapper.getByName(tagName);
-            log.info("已存在该内容的标签");
-            if(tmp != null){
-                return 0;
+        if (tag.getTagName() != null && !tag.getTagName().isEmpty()) {
+            Tag existing = tagMapper.getByName(tag.getTagName());
+            if (existing != null && !existing.getTagId().equals(tag.getTagId())) {
+                return 0; // 同名标签已存在（且不是自己）
             }
         }
         int affectRows = tagMapper.update(tag);
