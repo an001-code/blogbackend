@@ -5,18 +5,29 @@
 <mapper namespace="com.github.an001code.blog.mapper.TagMapper">
 
     <select id="getTagList" resultType="com.github.an001code.blog.pojo.Tag">
-        select *
-        from tag
+        SELECT *
+        FROM tag
         <where>
-            <if test="begin != null and end != null">
-                DATE(updated_at) between #{begin} and #{end}
+            <!-- 按状态过滤 -->
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <!-- 按时间范围过滤（注意：建议分开判断 begin 和 end） -->
+            <if test="begin != null and begin != ''">
+                AND DATE(updated_at) >= #{begin}
+            </if>
+            <if test="end != null and end != ''">
+                <![CDATA[
+                AND DATE(updated_at) <= #{end}
+                ]]>
             </if>
         </where>
-        order by updated_at desc
+        ORDER BY updated_at DESC
     </select>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="tagId">
-        insert into tag(tag_name,status) values(#{tagName},#{status})
+        insert into tag(tag_name, status)
+        values (#{tagName}, #{status})
     </insert>
 
     <update id="update" useGeneratedKeys="true" keyProperty="tagId">
