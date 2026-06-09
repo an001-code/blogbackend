@@ -3,6 +3,8 @@ package com.github.an001code.blog.interceptor;
 import com.alibaba.fastjson.JSONObject;
 import com.github.an001code.blog.pojo.Result;
 import com.github.an001code.blog.utils.JwtUtils;
+import com.github.an001code.blog.utils.UserContext;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +45,20 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         //解析token,如果解析错误，返回错误信息
         try{
-            JwtUtils.parseJwt(jwt);
+            Claims claims = JwtUtils.parseJwt(jwt);
+            Long userId = claims.get("userId", Long.class);  // 从JWT中获取用户ID
+
+            if (userId == null) {
+                log.info("JWT中未包含用户ID");
+                Result error = Result.error("NOT_LOGIN");
+                String notLogin = JSONObject.toJSONString(error);
+                resp.getWriter().write(notLogin);
+                return false;
+            }
+
+            // 设置到 ThreadLocal
+            UserContext.setUser(userId);
+            log.info("用户 {} 登录成功", userId);
         } catch (Exception e) {
             e.printStackTrace();
             log.info("解析令牌失败");
@@ -65,7 +80,9 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        UserContext.removeUser();
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
+
     }
 
 

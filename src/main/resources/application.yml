@@ -17,6 +17,28 @@ spring:
       database: 0
   profiles:
     active: dev
+  # ========== 添加 Elasticsearch 配置 ==========
+  elasticsearch:
+    uris: http://localhost:9200      # ES 连接地址
+    connection-timeout: 5s
+    socket-timeout: 60s
+  ai:
+    dashscope:
+      api-key: ${nuoma.ai.dashscope.key}
+      chat:
+        enabled: true
+        options:
+          model: qwen-plus
+          # model: qwen2.5-1.5b-instruct  免费模型
+      embedding:
+        enabled: true
+        options:
+          model: text-embedding-v3 #向量模型
+          dimensions: 1024 #向量维度维度
+    vectorstore: #向量库配置
+      elasticsearch: #使用ES作为向量库存储
+        initialize-schema: true  #开启初始化向量库结构
+        dimensions: 1024  #向量维度维度
 
 mybatis:
   configuration:
@@ -35,3 +57,24 @@ aliyun:
 logging:
   level:
     org.springframework.jdbc.support.JdbcTransactionManager: debug
+
+nuoma:
+  ai:
+    prompt:
+      system:
+        chat-data-id: system-chat-message.txt  
+        timeout-ms: 20000
+    dashscope:
+      key: ${aliQwen-api}
+    memory:
+      max: 100
+    session:
+      title: Hello，我是诺玛
+      describe: 我是博客网站的智能助理，我不仅能和你聊天、答疑解惑，还能帮您撰写博客，查询博客信息等。
+      examples:
+        - title: "网站介绍"
+          describe: "关于本网站的一些基本信息？"
+        - title: "博客撰写"
+          describe: "如何撰写博客"
+        - title: "博客查询"
+          describe: "查找感兴趣的博客"

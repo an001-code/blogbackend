@@ -15,11 +15,13 @@ import java.util.Map;
  */
 @Slf4j
 public class JwtUtils {
+    private static final String SECRET_STRING = "anonce123456789987654321abcdefghijk";
+    private static final SecretKey SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STRING.getBytes());
 
-    private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    //private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     // 令牌过期时间：12小时（单位：毫秒）
-    private static final long EXPIRATION = 12 * 60 * 60 * 1000L; // 12小时
+    private static final long EXPIRATION = 12000 * 60 * 60 * 1000L; // 12000小时，方便测试
 
     /**
      * 生成 JWT 令牌
@@ -43,6 +45,7 @@ public class JwtUtils {
      * @throws Exception 当 JWT 无效、过期或签名错误时抛出异常
      */
     public static Claims parseJwt(String jwt) {
+        log.info(jwt);
         return Jwts.parserBuilder()
                 .setSigningKey(SECRET_KEY)
                 .build()

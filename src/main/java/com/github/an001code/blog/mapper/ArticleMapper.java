@@ -18,6 +18,9 @@ public interface ArticleMapper {
     @Select("select a.*,t.tag_name from article a left join tag t on a.tag_id = t.tag_id where article_id = #{id}")
     Article getById(Long id);
 
+    @Select("select a.*,t.tag_name from article a left join tag t on a.tag_id = t.tag_id where a.title = #{title} and a.user_id = #{userId}")
+    Article findByTitleAndUserId(@Param("title") String title, @Param("userId") Long userId);
+
     @Select("select tag_id from article where article_id = #{articleId}")
     Long getTagId(Long articleId);
 

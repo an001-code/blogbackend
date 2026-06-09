@@ -5,6 +5,7 @@ import com.github.an001code.blog.pojo.*;
 import com.github.an001code.blog.service.UserService;
 import com.github.an001code.blog.utils.IdentifierUtils;
 import com.github.an001code.blog.utils.JwtUtils;
+import com.github.an001code.blog.utils.UserContext;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import jakarta.transaction.Transactional;
@@ -114,7 +115,8 @@ public class UserServiceImpl implements UserService {
         }
         else{
             Map<String, Object> claims = new HashMap<>();
-            claims.put("id", u.getUserId());
+            //UserContext.setUser(user.getUserId());
+            claims.put("userId", u.getUserId());
             claims.put("email", u.getEmail());
             String jwt = JwtUtils.generateJwt(claims);
             u.setJwt(jwt);
