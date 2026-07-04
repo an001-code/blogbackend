@@ -4,6 +4,7 @@ import com.github.an001code.blog.config.ToolResultHolder;
 import com.github.an001code.blog.mapper.ArticleMapper;
 import com.github.an001code.blog.pojo.Article;
 import com.github.an001code.blog.pojo.ArticleQuery;
+import com.github.an001code.blog.pojo.PageResult;
 import com.github.an001code.blog.service.ArticleService;
 import constants.Constant;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,9 @@ import org.springframework.ai.tool.annotation.ToolParam;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -90,5 +93,47 @@ public class BlogTools {
                     Map.of("success", false, "message", "博客修改失败"));
             return "博客修改失败，请重试";
         }
+    }
+
+    //查询文章工具
+    @Tool(description = Constant.Tools.SEARCH_ARTICLES)
+    public String searchArticles(
+            @ToolParam(description = "搜索关键词或主题") String keyword,
+            ToolContext toolContext) {
+
+        String requestId = (String) toolContext.getContext().get(Constant.REQUEST_ID);
+
+        ArticleQuery query = new ArticleQuery();
+        query.setQuery(keyword);
+        query.setStatus(1);
+        query.setPage(1);
+        query.setPageSize(3);
+
+        PageResult<Article> result = articleService.getArticleList(query);
+
+        if (result.getRows().isEmpty()) {
+            ToolResultHolder.put(requestId, "blog",
+                    Map.of("success", false, "message", "未找到与《" + keyword + "》相关的文章"));
+            return "未找到与《" + keyword + "》相关的文章";
+        }
+
+        List<Map<String, Object>> articles = result.getRows().stream()
+                .map(a -> Map.<String, Object>of(
+                        "articleId", a.getArticleId(),
+                        "title", a.getTitle(),
+                        "summary", a.getSummary() != null ? a.getSummary() : "",
+                        "tagName", a.getTagName() != null ? a.getTagName() : ""))
+                .collect(Collectors.toList());
+
+        ToolResultHolder.put(requestId, "blog",
+                Map.of("success", true, "articles", articles, "total", result.getTotal()));
+
+        String articleList = articles.stream()
+                .map(a -> "- 《" + a.get("title") + "》" +
+                        (a.get("tagName").toString().isEmpty() ? "" : " [" + a.get("tagName") + "]") +
+                        "\n  " + a.get("summary"))
+                .collect(Collectors.joining("\n"));
+
+        return "找到 " + result.getTotal() + " 篇与《" + keyword + "》相关的文章，以下是前 " + articles.size() + " 篇：\n" + articleList;
     }
 }
