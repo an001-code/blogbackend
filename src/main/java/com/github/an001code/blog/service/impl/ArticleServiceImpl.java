@@ -7,12 +7,15 @@ import com.github.an001code.blog.pojo.PageResult;
 import com.github.an001code.blog.service.ArticleDetailCacheService;
 import com.github.an001code.blog.service.ArticleListCacheService;
 import com.github.an001code.blog.service.ArticleService;
+import com.github.an001code.blog.service.ArticleVectorService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,11 +32,15 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleDetailCacheService articleDetailCacheService;
     @Autowired
     private ArticleListCacheService articleListCacheService;
+    @Autowired
+    private ArticleVectorService articleVectorService;
 
     //获取文章列表
     @Override
     public PageResult<Article> getArticleList(ArticleQuery articleQuery) {
-
+        if (articleQuery.getIsDeleted() == null) {
+            articleQuery.setIsDeleted(0); // 默认过滤已删除文章
+        }
         PageHelper.startPage(articleQuery.getPage(),articleQuery.getPageSize());
         List<Article> articles = articleMapper.getArticleList(articleQuery);
         Page<Article> p = (Page<Article>) articles;
@@ -82,6 +89,9 @@ public class ArticleServiceImpl implements ArticleService {
         if(article.getTagId() != null){
             tagService.increaseUseCount(article.getTagId());    //添加文章的时候，增加相应文章的标签的使用量
         }
+        if (affectRows > 0) {
+            runAfterCommit(() -> articleVectorService.indexArticle(article.getArticleId()));
+        }
         return affectRows;
     }
 
@@ -89,29 +99,45 @@ public class ArticleServiceImpl implements ArticleService {
     @Transactional
     public int update(ArticleQuery articleQuery) {
         if(articleQuery.getTagId() != null){
-            Long tagId = articleMapper.getTagId(articleQuery.getArticleId());//判断之前的标签与改后的标签时候一样，如果不同需要对标签的数量进行更改
+            Long tagId = articleMapper.getTagId(articleQuery.getArticleId());
             if(tagId != articleQuery.getTagId()){
                 tagService.decreaseUseCount(tagId);
                 tagService.increaseUseCount(articleQuery.getTagId());
             }
         }
        int affectRows = articleMapper.update(articleQuery);
-        // 更新成功后，更新缓存
         if (affectRows > 0) {
             articleDetailCacheService.updateArticleCache(articleQuery.getArticleId());
+            runAfterCommit(() -> articleVectorService.indexArticle(articleQuery.getArticleId()));
         }
        return affectRows;
     }
 
     @Override
+    @Transactional
     public boolean delete(List<Integer> ids) {
         int affectRows = articleMapper.logicDelete(ids);
         if(affectRows > 0){
-            // 删除缓存
             ids.forEach(id -> articleDetailCacheService.evictArticleCache(id.longValue()));
+            ids.forEach(id -> runAfterCommit(() -> articleVectorService.removeArticle(id.longValue())));
             return true;
         }
         return false;
+    }
+
+    private void runAfterCommit(Runnable task) {
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    CompletableFuture.runAsync(task)
+                            .exceptionally(ex -> { log.error("向量库操作失败", ex); return null; });
+                }
+            });
+        } else {
+            CompletableFuture.runAsync(task)
+                    .exceptionally(ex -> { log.error("向量库操作失败", ex); return null; });
+        }
     }
 
 

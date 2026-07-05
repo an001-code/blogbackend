@@ -2,19 +2,21 @@ package com.github.an001code.blog.controller;
 
 import com.github.an001code.blog.pojo.*;
 import com.github.an001code.blog.service.ArticleService;
+import com.github.an001code.blog.service.ArticleVectorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 public class ArticleController {
     @Autowired
     ArticleService articleService;
+    @Autowired
+    ArticleVectorService articleVectorService;
 
     /**
      * 文章列表查询
@@ -36,7 +38,7 @@ public class ArticleController {
      * @param id
      * @return
      */
-    @GetMapping("/articles/{id}")
+    @GetMapping("/articles/{id:\\d+}")
     public Result getById(@PathVariable Long id){
         log.info("进入getById");
         if(id == null){
@@ -87,7 +89,7 @@ public class ArticleController {
      * @param ids
      * @return
      */
-    @DeleteMapping("/articles/{ids}")
+    @DeleteMapping("/articles/{ids:[\\d,]+}")
     public Result delete(@PathVariable List<Integer> ids){
         log.info("进入delete");
         if(articleService.delete(ids)){
@@ -96,6 +98,23 @@ public class ArticleController {
         return Result.error("删除失败");
     }
 
+    /**
+     * 将已发布文章同步到 ES 向量库
+     */
+    @PostMapping("/articles/sync-vectors")
+    public Result syncToVectorStore() {
+        log.info("开始同步文章到向量库");
+        int count = articleVectorService.indexPublishedArticles();
+        return Result.success("成功同步 " + count + " 篇文章到向量库");
+    }
 
+    /**
+     * 检查 ES 向量库状态
+     */
+    @GetMapping("/articles/vector-status")
+    public Result vectorStatus() {
+        long count = articleVectorService.countDocuments();
+        return Result.success(Map.of("docCount", count, "isEmpty", count == 0));
+    }
 
 }

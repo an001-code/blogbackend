@@ -4,13 +4,15 @@ import com.github.an001code.blog.config.ToolResultHolder;
 import com.github.an001code.blog.mapper.ArticleMapper;
 import com.github.an001code.blog.pojo.Article;
 import com.github.an001code.blog.pojo.ArticleQuery;
-import com.github.an001code.blog.pojo.PageResult;
 import com.github.an001code.blog.service.ArticleService;
 import constants.Constant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.model.ToolContext;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,7 @@ public class BlogTools {
 
     private final ArticleService articleService;
     private final ArticleMapper articleMapper;
+    private final VectorStore vectorStore;
     
     //新增博客工具
     @Tool(description = Constant.Tools.CREATE_BLOG_BY_ID)
@@ -103,30 +106,25 @@ public class BlogTools {
 
         String requestId = (String) toolContext.getContext().get(Constant.REQUEST_ID);
 
-        ArticleQuery query = new ArticleQuery();
-        query.setQuery(keyword);
-        query.setStatus(1);
-        query.setPage(1);
-        query.setPageSize(3);
+        List<Document> docs = vectorStore.similaritySearch(
+                SearchRequest.builder().query(keyword).topK(3).similarityThreshold(0.3).build());
 
-        PageResult<Article> result = articleService.getArticleList(query);
-
-        if (result.getRows().isEmpty()) {
+        if (docs.isEmpty()) {
             ToolResultHolder.put(requestId, "blog",
                     Map.of("success", false, "message", "未找到与《" + keyword + "》相关的文章"));
             return "未找到与《" + keyword + "》相关的文章";
         }
 
-        List<Map<String, Object>> articles = result.getRows().stream()
-                .map(a -> Map.<String, Object>of(
-                        "articleId", a.getArticleId(),
-                        "title", a.getTitle(),
-                        "summary", a.getSummary() != null ? a.getSummary() : "",
-                        "tagName", a.getTagName() != null ? a.getTagName() : ""))
+        List<Map<String, Object>> articles = docs.stream()
+                .map(d -> Map.<String, Object>of(
+                        "articleId", d.getMetadata().getOrDefault("articleId", ""),
+                        "title", d.getMetadata().getOrDefault("title", ""),
+                        "summary", d.getMetadata().getOrDefault("summary", ""),
+                        "tagName", d.getMetadata().getOrDefault("tagName", "")))
                 .collect(Collectors.toList());
 
         ToolResultHolder.put(requestId, "blog",
-                Map.of("success", true, "articles", articles, "total", result.getTotal()));
+                Map.of("success", true, "articles", articles));
 
         String articleList = articles.stream()
                 .map(a -> "- 《" + a.get("title") + "》" +
@@ -134,6 +132,6 @@ public class BlogTools {
                         "\n  " + a.get("summary"))
                 .collect(Collectors.joining("\n"));
 
-        return "找到 " + result.getTotal() + " 篇与《" + keyword + "》相关的文章，以下是前 " + articles.size() + " 篇：\n" + articleList;
+        return "找到以下与《" + keyword + "》相关的文章：\n" + articleList;
     }
 }

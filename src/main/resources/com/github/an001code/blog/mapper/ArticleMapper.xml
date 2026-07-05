@@ -81,7 +81,7 @@
     </select>
 
 
-    <insert id="insert">
+    <insert id="insert" useGeneratedKeys="true" keyProperty="articleId">
         insert into article (user_id,tag_id,title,content,summary,cover_image,status,published_at)
         values (#{userId},#{tagId},#{title},#{content},#{summary},#{coverImage},#{status},#{publishedAt})
     </insert>
