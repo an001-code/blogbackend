@@ -8,11 +8,11 @@ import com.github.an001code.blog.utils.JwtUtils;
 import com.github.an001code.blog.utils.UserContext;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -128,21 +128,23 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User register(User user) {
-        Long l = addUser(user);
-        User u = new User();
-        if(l<=0){
-            return u;
+        Long id = addUser(user);
+        if (id == null || id <= 0) {
+            log.warn("注册失败: email={}, reason={}", user.getEmail(), id == null ? "插入后未获取到ID" : "邮箱已存在或密码为空");
+            return null;
         }
-        u = userMapper.getByEmail(user.getEmail());
-        if(u == null){
-            return u;
+        User u = userMapper.getByEmail(user.getEmail());
+        if (u == null) {
+            log.error("注册异常: 插入成功但查询不到用户, email={}", user.getEmail());
+            return null;
         }
         Map<String, Object> claims = new HashMap<>();
-        claims.put("id", u.getUserId());
+        claims.put("userId", u.getUserId());
         claims.put("email", u.getEmail());
         String jwt = JwtUtils.generateJwt(claims);
         u.setJwt(jwt);
         u.setPassword(null);
+        log.info("注册成功: userId={}, email={}", u.getUserId(), u.getEmail());
         return u;
     }
 }

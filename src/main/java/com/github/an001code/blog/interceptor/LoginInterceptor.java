@@ -27,8 +27,8 @@ public class LoginInterceptor implements HandlerInterceptor {
         //获取请求url
         String url = req.getRequestURL().toString();
         //判断url中是否包含url,如果有，说明是登录请求，放行。
-        if(url.contains("login")){
-            log.info("登录操作，放行");
+        if(url.contains("login") || url.contains("register")){
+            log.info("登录/注册操作，放行");
             return true;
         }
 
