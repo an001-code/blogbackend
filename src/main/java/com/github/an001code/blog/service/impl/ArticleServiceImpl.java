@@ -108,7 +108,7 @@ public class ArticleServiceImpl implements ArticleService {
        int affectRows = articleMapper.update(articleQuery);
         if (affectRows > 0) {
             articleDetailCacheService.updateArticleCache(articleQuery.getArticleId());
-            runAfterCommit(() -> articleVectorService.indexArticle(articleQuery.getArticleId()));
+            runAfterCommit(() -> refreshArticleVector(articleQuery.getArticleId()));
         }
        return affectRows;
     }
@@ -137,6 +137,15 @@ public class ArticleServiceImpl implements ArticleService {
         } else {
             CompletableFuture.runAsync(task)
                     .exceptionally(ex -> { log.error("向量库操作失败", ex); return null; });
+        }
+    }
+
+    private void refreshArticleVector(Long articleId) {
+        Article article = articleMapper.getById(articleId);
+        if (article == null || article.getStatus() != 1 || article.getIsDeleted() == 1) {
+            articleVectorService.removeArticle(articleId);
+        } else {
+            articleVectorService.indexArticle(articleId);
         }
     }
 

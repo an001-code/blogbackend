@@ -40,6 +40,9 @@ public class ArticleVectorService {
         int total = 0;
 
         for (Article a : articles) {
+            if (!isIndexable(a)) {
+                continue;
+            }
             batch.add(new Document(
                     String.valueOf(a.getArticleId()),
                     buildDocumentText(a),
@@ -76,9 +79,11 @@ public class ArticleVectorService {
      */
     public void indexArticle(Long articleId) {
         Article article = articleMapper.getById(articleId);
-        if (article == null || article.getStatus() != 1 || article.getIsDeleted() == 1) {
+        if (!isIndexable(article)) {
+            removeArticle(articleId);
             return;
         }
+        removeArticle(articleId);
         Document doc = new Document(
                 String.valueOf(article.getArticleId()),
                 buildDocumentText(article),
@@ -120,5 +125,22 @@ public class ArticleVectorService {
             sb.append("\n").append(content);
         }
         return sb.toString();
+    }
+
+    private boolean isIndexable(Article article) {
+        if (article == null || article.getArticleId() == null) {
+            return false;
+        }
+        if (article.getStatus() == null || article.getStatus() != 1) {
+            return false;
+        }
+        if (article.getIsDeleted() != null && article.getIsDeleted() == 1) {
+            return false;
+        }
+        return hasText(article.getTitle()) && (hasText(article.getSummary()) || hasText(article.getContent()));
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 }
