@@ -36,9 +36,6 @@ public class ChatServiceImpl implements ChatService {
             .build();
     private final ChatClient chatClient;
     private final SystemPromptConfig systemPromptConfig;
-    // 存储大模型的生成状态，这里采用ConcurrentHashMap是确保线程安全
-    // 目前的版本暂时用Map实现，如果考虑分布式环境的话，可以考虑用redis来实现
-    //private static final Map<String, Boolean> GENERATE_STATUS = new ConcurrentHashMap<>();
     private final StringRedisTemplate stringRedisTemplate;
 
     private static final String GENERATE_STATUS_KEY = "GENERATE_STATUS_KEY";

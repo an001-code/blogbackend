@@ -7,6 +7,7 @@ import com.github.an001code.blog.pojo.ArticleQuery;
 import com.github.an001code.blog.service.ArticleService;
 import constants.Constant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.tool.annotation.Tool;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class BlogTools {
@@ -39,13 +41,14 @@ public class BlogTools {
         Map<String, Object> ctx = toolContext.getContext();
         Long userId = (Long) ctx.get(Constant.USER_ID);
         String requestId = (String) ctx.get(Constant.REQUEST_ID);
+        log.info("addBlogById 工具被调用, userId={}, title={}", userId, title);
 
         Article article = Article.builder()
                 .userId(userId)
                 .title(title)
                 .content(content)
                 .summary(summary)
-                .status(1)
+                .status(0) // AI 生成的文章默认草稿，用户确认后发布
                 .build();
 
         int rows = articleService.addArticle(article);
@@ -53,7 +56,7 @@ public class BlogTools {
         if (rows > 0) {
             ToolResultHolder.put(requestId, "blog",
                     Map.of("success", true, "articleId", article.getArticleId(), "message", "博客创建成功"));
-            return "博客《" + title + "》创建成功，文章ID: " + article.getArticleId();
+            return "博客《" + title + "》已生成草稿，请前往用户中心确认内容后发布";
         } else {
             ToolResultHolder.put(requestId, "blog",
                     Map.of("success", false, "message", "博客创建失败"));

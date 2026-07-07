@@ -28,7 +28,7 @@ spring:
       chat:
         enabled: true
         options:
-          model: qwen-plus
+          model: qwen-max
           # model: qwen2.5-1.5b-instruct  免费模型
       embedding:
         enabled: true
@@ -67,7 +67,7 @@ nuoma:
     dashscope:
       key: ${aliQwen-api}
     memory:
-      max: 100
+      max: 20
     session:
       title: Hello，我是诺玛
       describe: 我是博客网站的智能助理，我不仅能和你聊天、答疑解惑，还能帮您撰写博客，查询博客信息等。

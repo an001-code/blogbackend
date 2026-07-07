@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SpringAIConfig {
 
-    @Value("${nuoma.ai.memory.max:100}")
+    @Value("${nuoma.ai.memory.max:20}")
     private Integer maxMessages;
 
 
